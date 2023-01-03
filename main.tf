@@ -13,7 +13,7 @@ locals {
 resource "citrixadc_csaction" "cs_action_lb" {
   count           = length(var.adc-cs-lb.name)
   name            = "cs_act_${element(var.adc-cs-lb["name"],count.index)}"
-  targetlbvserver = "lb_vs_${element(var.adc["name"],count.index)}"
+  targetlbvserver = "lb_vs_${element(var.adc-cs-lb["name"],count.index)}"
 }
 
 resource "citrixadc_csaction" "cs_action_gw" {
