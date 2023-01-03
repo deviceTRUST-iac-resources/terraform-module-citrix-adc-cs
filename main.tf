@@ -95,3 +95,18 @@ resource "citrixadc_nsconfig_save" "cs_save" {
     ]
 
 }
+
+#####
+# Wait for config save to commence properly, before allowing the subsequent module to run.
+#####
+
+
+resource "time_sleep" "cs_wait" {
+
+  create_duration = "5s"
+
+  depends_on = [
+    citrixadc_nsconfig_save.cs_save
+  ]
+
+}
