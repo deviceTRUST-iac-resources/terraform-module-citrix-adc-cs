@@ -72,9 +72,9 @@ resource "citrixadc_csvserver" "cs_vserver" {
 #####
 
 resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_lb" {
-    count                  = length(citrixadc_cspolicy.cs_policy_lb.policyname)
+    count                  = length(var.adc-cs-lb.name)
     name                   = citrixadc_csvserver.cs_vserver.name
-    policyname             = element(citrixadc_cspolicy.cs_policy_lb["policyname"],count.index)
+    policyname             = element(citrixadc_cspolicy.cs_policy_lb.policyname,count.index)
     priority               = count.index * 10
     gotopriorityexpression = "END"
 
@@ -86,7 +86,7 @@ resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_lb" {
 resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_gw" {
     count                  = length(citrixadc_cspolicy.cs_policy_gw.policyname)
     name                   = citrixadc_csvserver.cs_vserver.name
-    policyname             = element(citrixadc_cspolicy.cs_policy_gw["policyname"],count.index)
+    policyname             = element(citrixadc_cspolicy.cs_policy_gw.policyname,count.index)
     priority               = count.index * 1000
     gotopriorityexpression = "END"
 
