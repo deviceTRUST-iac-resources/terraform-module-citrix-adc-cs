@@ -1,9 +1,9 @@
 locals {
-  cs_vs_port        = 443
-  cs_vs_servicetype = "SSL"
-  cs_vs_sslprofile  = "ssl_prof_${var.adc-base.environmentname}_fe_TLS1213"
-  cs_vs_httpprofile = "http_prof_${var.adc-base.environmentname}"
-  cs_vs_tcpprofile  = "tcp_prof_${var.adc-base.environmentname}"
+  cs_vserver_port        = 443
+  cs_vserver_servicetype = "SSL"
+  cs_vserver_sslprofile  = "ssl_prof_${var.adc-base.environmentname}_fe_TLS1213"
+  cs_vserver_httpprofile = "http_prof_${var.adc-base.environmentname}"
+  cs_vserver_tcpprofile  = "tcp_prof_${var.adc-base.environmentname}"
 }
 
 #####
@@ -53,13 +53,13 @@ resource "citrixadc_cspolicy" "cs_policy_gw" {
 # Add Content Switching vServer
 #####
 resource "citrixadc_csvserver" "cs_vserver" {
-  name            = var.adc-cs.vs_name
-  ipv46           = var.adc-cs.vs_ip
-  port            = local.cs_vs_port
-  servicetype     = local.cs_vs_servicetype
-  sslprofile      = local.cs_vs_sslprofile
-  httpprofilename = local.cs_vs_httpprofile
-  tcpprofilename  = local.cs_vs_tcpprofile
+  name            = var.adc-cs.vserver_name
+  ipv46           = var.adc-cs.vserver_ip
+  port            = local.cs_vserver_port
+  servicetype     = local.cs_vserver_servicetype
+  sslprofile      = local.cs_vserver_sslprofile
+  httpprofilename = local.cs_vserver_httpprofile
+  tcpprofilename  = local.cs_vserver_tcpprofile
 
   depends_on = [
     citrixadc_cspolicy.cs_policy_lb,
