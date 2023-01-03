@@ -58,8 +58,8 @@ resource "citrixadc_csvserver" "cs_vserver" {
   port            = local.cs_vs_port
   servicetype     = local.cs_vs_servicetype
   sslprofile      = local.cs_vs_sslprofile
-  httpprofilename = local.cs_vs_httpprofilename
-  tcpprofilename  = local.cs_vs_tcpprofilename
+  httpprofilename = local.cs_vs_httpprofile
+  tcpprofilename  = local.cs_vs_tcpprofile
 
   depends_on = [
     citrixadc_cspolicy.cs_policy_lb,
