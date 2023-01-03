@@ -1,51 +1,69 @@
+locals {
+  cs_vs_port        = 443
+  cs_vs_servicetype = "SSL"
+  cs_vs_sslprofile  = "ssl_prof_${var.adc-base.environmentname}_fe_TLS1213"
+  cs_vs_httpprofile = "http_prof_${var.adc-base.environmentname}"
+  cs_vs_tcpprofile  = "tcp_prof_${var.adc-base.environmentname}"
+}
+
 #####
 # Add Content Switching Actions
 #####
 
 resource "citrixadc_csaction" "cs_action_lb" {
-  count         = length(var.adc-cs-action-lb.name)
-  name          = element(var.adc-cs-action-lb["name"],count.index)
-  targetlbvserver = element(var.adc-cs-action-lb["targetlbvserver"],count.index)
+  count           = length(var.adc-cs-lb.name)
+  name            = "cs_act_${element(var.adc-cs-lb["name"],count.index)}"
+  targetlbvserver = "lb_vs_${element(var.adc-cs-lb["targetlbvserver"],count.index)}"
 }
 
 resource "citrixadc_csaction" "cs_action_gw" {
-  count         = length(var.adc-cs-action-gw.name)
-  name          = element(var.adc-cs-action-gw["name"],count.index)
-  targetvserver = element(var.adc-cs-action-gw["targetvserver"],count.index)
+  count           = length(var.adc-cs-lb.name)
+  name            = "cs_act_${element(var.adc-cs-gw["name"],count.index)}"
+  targetlbvserver = "gw_vs_${element(var.adc-cs-gw["targetlbvserver"],count.index)}"
 }
 
 #####
 # Add Content Switching Policies
 #####
-
-resource "citrixadc_cspolicy" "cs_policy" {
-  count      = length(var.adc-cs-policy.policyname)
-  policyname = element(var.adc-cs-policy["policyname"],count.index)
-  rule       = element(var.adc-cs-policy["rule"],count.index)
-  action     = element(var.adc-cs-policy["action"],count.index)
+resource "citrixadc_cspolicy" "cs_policy_lb" {
+  count      = length(var.adc-cs-lb.name)
+  policyname = "cs_pol_${element(var.adc-cs-lb["name"],count.index)}"
+  rule       = "HTTP.REQ.HOSTNAME.CONTAINS(\"${element(var.adc-cs-lb["name"],count.index)}\")"
+  action     = "cs_act_${element(var.adc-cs-lb["name"],count.index)}"
 
   depends_on = [
     citrixadc_csaction.cs_action_lb,
     citrixadc_csaction.cs_action_gw
   ]
+}
 
+resource "citrixadc_cspolicy" "cs_policy_gw" {
+  count      = length(var.adc-cs-gw.name)
+  policyname = "cs_pol_${element(var.adc-cs-gw["name"],count.index)}"
+  rule       = "HTTP.REQ.HOSTNAME.CONTAINS(\"${element(var.adc-cs-gw["name"],count.index)}\")"
+  action     = "cs_act_${element(var.adc-cs-gw["name"],count.index)}"
+
+  depends_on = [
+    citrixadc_csaction.cs_action_lb,
+    citrixadc_csaction.cs_action_gw
+  ]
 }
 
 #####
 # Add Content Switching vServer
 #####
 resource "citrixadc_csvserver" "cs_vserver" {
-  count       = length(var.adc-cs-vserver.name)
-  name        = element(var.adc-cs-vserver["name"],count.index)
-  ipv46       = element(var.adc-cs-vserver["ipv46"],count.index)
-  port        = element(var.adc-cs-vserver["port"],count.index)
-  servicetype = element(var.adc-cs-vserver["servicetype"],count.index)
-  sslprofile  = element(var.adc-cs-vserver["sslprofile"],count.index)
-  httpprofilename = element(var.adc-cs-vserver["httpprofile"],count.index)
-  tcpprofilename  = element(var.adc-cs-vserver["tcpprofile"],count.index)
+  name            = var.adc-cs.vs_name
+  ipv46           = var.adc-cs.vs_ip
+  port            = local.cs_vs_port
+  servicetype     = local.cs_vs_servicetype
+  sslprofile      = local.cs_vs_sslprofile
+  httpprofilename = local.cs_vs_httpprofilename
+  tcpprofilename  = local.cs_vs_tcpprofilename
 
   depends_on = [
-    citrixadc_cspolicy.cs_policy
+    citrixadc_cspolicy.cs_policy_lb,
+    citrixadc_cspolicy.cs_policy_gw
   ]
 }
 
@@ -53,12 +71,24 @@ resource "citrixadc_csvserver" "cs_vserver" {
 # Bind Content Switching Policies to Content Switching vServer
 #####
 
-resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding" {
-    count          = length(var.adc-cs-vserver-cspolicybinding.policyname)
-    name           = element(var.adc-cs-vserver-cspolicybinding["name"],count.index)
-    policyname     = element(var.adc-cs-vserver-cspolicybinding["policyname"],count.index)
-    priority       = element(var.adc-cs-vserver-cspolicybinding["priority"],count.index)
-    # gotopriorityexpression = element(var.adc-cs-vserver-cspolicybinding["gotopriorityexpression"],count.index)
+resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_lb" {
+    count                  = length(citrixadc_cspolicy.cs_policy_lb.name)
+    name                   = citrixadc_csvserver.cs_vserver.name
+    policyname             = element(citrixadc_cspolicy.cs_policy_lb["policyname"],count.index)
+    priority               = count.index * 10
+    gotopriorityexpression = "END"
+
+  depends_on  = [
+    citrixadc_csvserver.cs_vserver
+  ]
+}
+
+resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_gw" {
+    count                  = length(citrixadc_cspolicy.cs_policy_gw.name)
+    name                   = citrixadc_csvserver.cs_vserver.name
+    policyname             = element(citrixadc_cspolicy.cs_policy_gw["policyname"],count.index)
+    priority               = count.index * 1000
+    gotopriorityexpression = "END"
 
   depends_on  = [
     citrixadc_csvserver.cs_vserver
@@ -69,29 +99,27 @@ resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding" {
 # Bind SSL certificate to CS vServers
 #####
 
-resource "citrixadc_sslvserver_sslcertkey_binding" "cs_sslvserver_sslcertkey_binding" {
-    count       = length(var.adc-cs-vserver.name)
-    vservername = element(var.adc-cs-vserver["name"],count.index)
-    certkeyname = "ssl_cert_democloud"
-    snicert     = false
+#resource "citrixadc_sslvserver_sslcertkey_binding" "cs_sslvserver_sslcertkey_binding" {
+#    vservername = citrixadc_csvserver.cs_vserver.name
+#    certkeyname = "ssl_cert_${var.adc-base.environmentname}"
+#    snicert     = false
 
-    depends_on  = [
-      citrixadc_csvserver.cs_vserver
-    ]
-}
+#    depends_on  = [
+#      citrixadc_csvserver.cs_vserver
+#    ]
+#}
 
 #####
 # Save config
 #####
-
 resource "citrixadc_nsconfig_save" "cs_save" {
     
     all        = true
     timestamp  = timestamp()
 
     depends_on = [
-        citrixadc_csvserver_cspolicy_binding.cs_vserverpolicybinding,
-        citrixadc_sslvserver_sslcertkey_binding.cs_sslvserver_sslcertkey_binding
+        citrixadc_csvserver_cspolicy_binding.cs_vserverpolicybinding_gw,
+        citrixadc_csvserver_cspolicy_binding.cs_vserverpolicybinding_lb
     ]
 
 }
