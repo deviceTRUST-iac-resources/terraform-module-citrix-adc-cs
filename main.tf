@@ -18,8 +18,8 @@ resource "citrixadc_csaction" "cs_action_lb" {
 
 resource "citrixadc_csaction" "cs_action_gw" {
   count         = length(var.adc-cs-gw.name)
-  name          = "cs_act_${element(var.adc-cs-gw["name"],count.index)}_http_80"
-  targetvserver = "gw_vs_${element(var.adc-cs-gw["name"],count.index)}_http_80"
+  name          = "cs_act_${element(var.adc-cs-gw["name"],count.index)}_ssl_443"
+  targetvserver = "gw_vs_${element(var.adc-cs-gw["name"],count.index)}_ssl_443"
 }
 
 #####
@@ -39,9 +39,9 @@ resource "citrixadc_cspolicy" "cs_policy_lb" {
 
 resource "citrixadc_cspolicy" "cs_policy_gw" {
   count      = length(var.adc-cs-gw.name)
-  policyname = "cs_pol_${element(var.adc-cs-gw["name"],count.index)}_http_80"
+  policyname = "cs_pol_${element(var.adc-cs-gw["name"],count.index)}_ssl_443"
   rule       = "HTTP.REQ.HOSTNAME.CONTAINS(\"${element(var.adc-cs-gw["name"],count.index)}\")"
-  action     = "cs_act_${element(var.adc-cs-gw["name"],count.index)}_http_80"
+  action     = "cs_act_${element(var.adc-cs-gw["name"],count.index)}_ssl_443"
 
   depends_on = [
     citrixadc_csaction.cs_action_lb,
