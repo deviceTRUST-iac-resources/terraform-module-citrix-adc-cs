@@ -13,13 +13,13 @@ locals {
 resource "citrixadc_csaction" "cs_action_lb" {
   count         = length(var.adc-lb.name)
   name          = "cs_act_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["type"],count.index)}_${element(var.adc-lb["port"],count.index)}"
-  targetvserver = "lb_vs_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["type"],count.index)}_${element(var.adc-lb["port"],count.index)}"
+  targetlbvserver = "lb_vs_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["type"],count.index)}_${element(var.adc-lb["port"],count.index)}"
 }
 
 resource "citrixadc_csaction" "cs_action_gw" {
   count           = length(var.adc-cs-gw.name)
   name            = "cs_act_${element(var.adc-cs-gw["name"],count.index)}_ssl_443"
-  targetlbvserver = "gw_vs_${element(var.adc-cs-gw["name"],count.index)}_ssl_443"
+  targetvserver = "gw_vs_${element(var.adc-cs-gw["name"],count.index)}_ssl_443"
 }
 
 #####
