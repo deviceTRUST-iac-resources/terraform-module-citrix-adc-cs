@@ -12,14 +12,14 @@ locals {
 
 resource "citrixadc_csaction" "cs_action_lb" {
   count           = length(var.adc-cs-lb.name)
-  name            = "cs_act_${element(var.adc-cs-lb["name"],count.index)}_http_80"
-  targetlbvserver = "lb_vs_${element(var.adc-cs-lb["name"],count.index)}_http_80"
+  name            = "cs_act_${element(var.adc-cs-lb["name"],count.index)}.${var.adc-base.fqdn_int}_http_80"
+  targetlbvserver = "lb_vs_${element(var.adc-cs-lb["name"],count.index)}.${var.adc-base.fqdn_int}_http_80"
 }
 
 resource "citrixadc_csaction" "cs_action_gw" {
   count         = length(var.adc-cs-gw.name)
-  name          = "cs_act_${element(var.adc-cs-gw["name"],count.index)}_ssl_443"
-  targetvserver = "gw_vs_${element(var.adc-cs-gw["name"],count.index)}_ssl_443"
+  name          = "cs_act_${element(var.adc-cs-gw["name"],count.index)}.${var.adc-base.fqdn_ext}_ssl_443"
+  targetvserver = "gw_vs_${element(var.adc-cs-gw["name"],count.index)}.${var.adc-base.fqdn_ext}_ssl_443"
 }
 
 #####
@@ -27,9 +27,9 @@ resource "citrixadc_csaction" "cs_action_gw" {
 #####
 resource "citrixadc_cspolicy" "cs_policy_lb" {
   count      = length(var.adc-cs-lb.name)
-  policyname = "cs_pol_${element(var.adc-cs-lb["name"],count.index)}_http_80"
-  rule       = "HTTP.REQ.HOSTNAME.CONTAINS(\"${element(var.adc-cs-lb["name"],count.index)}\")"
-  action     = "cs_act_${element(var.adc-cs-lb["name"],count.index)}_http_80"
+  policyname = "cs_pol_${element(var.adc-cs-lb["name"],count.index)}.${var.adc-base.fqdn_ext}_http_80"
+  rule       = "HTTP.REQ.HOSTNAME.CONTAINS(\"${element(var.adc-cs-lb["name"],count.index)}.${var.adc-base.fqdn_ext}\")"
+  action     = "cs_act_${element(var.adc-cs-lb["name"],count.index)}.${var.adc-base.fqdn_int}_http_80"
 
   depends_on = [
     citrixadc_csaction.cs_action_lb,
@@ -39,9 +39,9 @@ resource "citrixadc_cspolicy" "cs_policy_lb" {
 
 resource "citrixadc_cspolicy" "cs_policy_gw" {
   count      = length(var.adc-cs-gw.name)
-  policyname = "cs_pol_${element(var.adc-cs-gw["name"],count.index)}_ssl_443"
-  rule       = "HTTP.REQ.HOSTNAME.CONTAINS(\"${element(var.adc-cs-gw["name"],count.index)}\")"
-  action     = "cs_act_${element(var.adc-cs-gw["name"],count.index)}_ssl_443"
+  policyname = "cs_pol_${element(var.adc-cs-gw["name"],count.index)}.${var.adc-base.fqdn_ext}_ssl_443"
+  rule       = "HTTP.REQ.HOSTNAME.CONTAINS(\"${element(var.adc-cs-gw["name"],count.index)}.${var.adc-base.fqdn_ext}\")"
+  action     = "cs_act_${element(var.adc-cs-gw["name"],count.index)}.${var.adc-base.fqdn_ext}_ssl_443"
 
   depends_on = [
     citrixadc_csaction.cs_action_lb,
