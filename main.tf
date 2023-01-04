@@ -74,7 +74,7 @@ resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_lb" {
     count                  = length(var.adc-cs-lb.name)
     name                   = citrixadc_csvserver.cs_vserver.name
     policyname             = citrixadc_cspolicy.cs_policy_lb[count.index].policyname
-    priority               = count.index * 10
+    priority               = (count.index + 1 )* 10
     gotopriorityexpression = "END"
  
   depends_on  = [
@@ -86,7 +86,7 @@ resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_gw" {
     count                  = length(var.adc-cs-gw.name)
     name                   = citrixadc_csvserver.cs_vserver.name
     policyname             = "cs_pol_${element(var.adc-cs-gw["name"],count.index)}"
-    priority               = count.index * 1000
+    priority               = (count.index + 1) * 1000
     gotopriorityexpression = "END"
 
   depends_on  = [
