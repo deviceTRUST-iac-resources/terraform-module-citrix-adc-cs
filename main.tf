@@ -1,6 +1,6 @@
 locals {
   cs_vserver_port        = 443
-  cs_vserver_servicetype = "SSL"
+  cs_vserver_type        = "SSL"
   cs_vserver_sslprofile  = "ssl_prof_${var.adc-base.environmentname}_fe_TLS1213"
   cs_vserver_httpprofile = "http_prof_${var.adc-base.environmentname}"
   cs_vserver_tcpprofile  = "tcp_prof_${var.adc-base.environmentname}"
@@ -12,13 +12,13 @@ locals {
 
 resource "citrixadc_csaction" "cs_action_lb" {
   count           = length(var.adc-lb.name)
-  name            = "cs_act_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["servicetype"],count.index)}_${element(var.adc-lb["port"],count.index)}"
-  targetlbvserver = "lb_vs_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["servicetype"],count.index)}_${element(var.adc-lb["port"],count.index)}"
+  name            = "cs_act_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["type"],count.index)}_${element(var.adc-lb["port"],count.index)}"
+  targetlbvserver = "lb_vs_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["type"],count.index)}_${element(var.adc-lb["port"],count.index)}"
 }
 
 resource "citrixadc_csaction" "cs_action_gw" {
   count           = length(var.adc-cs-gw.name)
-  name            = "cs_act_${element(var.adc-cs-gw["name"],count.index)}_${element(var.adc-cs-gw["servicetype"],count.index)}_${element(var.adc-cs-gw["port"],count.index)}"
+  name            = "cs_act_${element(var.adc-cs-gw["name"],count.index)}_${element(var.adc-cs-gw["type"],count.index)}_${element(var.adc-cs-gw["port"],count.index)}"
   targetlbvserver = "gw_vs_${element(var.adc-cs-gw["name"],count.index)}_ssl_443"
 }
 
@@ -27,9 +27,9 @@ resource "citrixadc_csaction" "cs_action_gw" {
 #####
 resource "citrixadc_cspolicy" "cs_policy_lb" {
   count      = length(var.adc-lb.name)
-  policyname = "cs_pol_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["servicetype"],count.index)}_${element(var.adc-lb["port"],count.index)}"
+  policyname = "cs_pol_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["type"],count.index)}_${element(var.adc-lb["port"],count.index)}"
   rule       = "HTTP.REQ.HOSTNAME.CONTAINS(\"${element(var.adc-lb["name"],count.index)}\")"
-  action     = "cs_act_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["servicetype"],count.index)}_${element(var.adc-lb["port"],count.index)}"
+  action     = "cs_act_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["type"],count.index)}_${element(var.adc-lb["port"],count.index)}"
 
   depends_on = [
     citrixadc_csaction.cs_action_lb,
@@ -56,7 +56,7 @@ resource "citrixadc_csvserver" "cs_vserver" {
   name            = var.adc-cs.vserver_name
   ipv46           = var.adc-cs.vserver_ip
   port            = local.cs_vserver_port
-  servicetype     = local.cs_vserver_servicetype
+  servicetype     = local.cs_vserver_type
   sslprofile      = local.cs_vserver_sslprofile
   httpprofilename = local.cs_vserver_httpprofile
   tcpprofilename  = local.cs_vserver_tcpprofile
