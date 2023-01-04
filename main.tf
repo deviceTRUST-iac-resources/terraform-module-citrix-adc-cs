@@ -85,7 +85,7 @@ resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_lb" {
 resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_gw" {
     count                  = length(var.adc-cs-gw.name)
     name                   = citrixadc_csvserver.cs_vserver.name
-    policyname             = "cs_pol_${element(var.adc-cs-gw["name"],count.index)}"
+    policyname             = citrixadc_cspolicy.cs_policy_gw[count.index].policyname
     priority               = (count.index + 1) * 1000
     gotopriorityexpression = "END"
 
