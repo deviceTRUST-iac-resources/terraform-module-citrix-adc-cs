@@ -11,9 +11,9 @@ locals {
 #####
 
 resource "citrixadc_csaction" "cs_action_lb" {
-  count           = length(var.var.adc-cs-lb.name)
-  name            = "cs_act_${element(var.var.adc-cs-lb["name"],count.index)}_ssl_443"
-  targetlbvserver = "lb_vs_${element(var.var.adc-cs-lb["name"],count.index)}_ssl_443"
+  count           = length(var.adc-cs-lb.name)
+  name            = "cs_act_${element(var.adc-cs-lb["name"],count.index)}_ssl_443"
+  targetlbvserver = "lb_vs_${element(var.adc-cs-lb["name"],count.index)}_ssl_443"
 }
 
 resource "citrixadc_csaction" "cs_action_gw" {
@@ -26,10 +26,10 @@ resource "citrixadc_csaction" "cs_action_gw" {
 # Add Content Switching Policies
 #####
 resource "citrixadc_cspolicy" "cs_policy_lb" {
-  count      = length(var.var.adc-cs-lb.name)
-  policyname = "cs_pol_${element(var.var.adc-cs-lb["name"],count.index)}_ssl_443"
-  rule       = "HTTP.REQ.HOSTNAME.CONTAINS(\"${element(var.var.adc-cs-lb["name"],count.index)}\")"
-  action     = "cs_act_${element(var.var.adc-cs-lb["name"],count.index)}_ssl_443"
+  count      = length(var.adc-cs-lb.name)
+  policyname = "cs_pol_${element(var.adc-cs-lb["name"],count.index)}_ssl_443"
+  rule       = "HTTP.REQ.HOSTNAME.CONTAINS(\"${element(var.adc-cs-lb["name"],count.index)}\")"
+  action     = "cs_act_${element(var.adc-cs-lb["name"],count.index)}_ssl_443"
 
   depends_on = [
     citrixadc_csaction.cs_action_lb,
@@ -71,7 +71,7 @@ resource "citrixadc_csvserver" "cs_vserver" {
 # Bind Content Switching Policies to Content Switching vServer
 #####
 resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_lb" {
-    count                  = length(var.var.adc-cs-lb.name)
+    count                  = length(var.adc-cs-lb.name)
     name                   = citrixadc_csvserver.cs_vserver.name
     policyname             = citrixadc_cspolicy.cs_policy_lb[count.index].policyname
     priority               = count.index * 10
@@ -94,9 +94,9 @@ resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_gw" {
   ]
 }
 #resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_lb" {
-#    count                  = length(var.var.adc-cs-lb.name)
+#    count                  = length(var.adc-cs-lb.name)
 #    name                   = citrixadc_csvserver.cs_vserver.name
-#    policyname             = "cs_pol_${element(var.var.adc-cs-lb["name"],count.index)}"
+#    policyname             = "cs_pol_${element(var.adc-cs-lb["name"],count.index)}"
 #    priority               = count.index * 10
 #    gotopriorityexpression = "END"
 
