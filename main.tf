@@ -71,7 +71,7 @@ resource "citrixadc_csvserver" "cs_vserver" {
 # Bind Content Switching Policies to Content Switching vServer
 #####
 resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_lb" {
-    count                  = length(var.adc-cs-lb.name)
+    count                  = length(var.adc-lb.name)
     name                   = citrixadc_csvserver.cs_vserver.name
     policyname             = citrixadc_cspolicy.cs_policy_lb.name
     priority               = count.index * 10
@@ -94,9 +94,9 @@ resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_gw" {
   ]
 }
 #resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_lb" {
-#    count                  = length(var.adc-cs-lb.name)
+#    count                  = length(var.adc-lb.name)
 #    name                   = citrixadc_csvserver.cs_vserver.name
-#    policyname             = "cs_pol_${element(var.adc-cs-lb["name"],count.index)}"
+#    policyname             = "cs_pol_${element(var.adc-lb["name"],count.index)}"
 #    priority               = count.index * 10
 #    gotopriorityexpression = "END"
 
