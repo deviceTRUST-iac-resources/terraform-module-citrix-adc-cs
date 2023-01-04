@@ -7,5 +7,5 @@ variable adc-base {}
 # Variables
 #####
 variable adc-cs {}
-variable adc-cs-lb {}
+variable adc-lb {}
 variable adc-cs-gw {}
