@@ -11,9 +11,9 @@ locals {
 #####
 
 resource "citrixadc_csaction" "cs_action_lb" {
-  count           = length(var.adc-lb.name)
-  name            = "cs_act_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["type"],count.index)}_${element(var.adc-lb["port"],count.index)}"
-  targetlbvserver = "lb_vs_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["type"],count.index)}_${element(var.adc-lb["port"],count.index)}"
+  count         = length(var.adc-lb.name)
+  name          = "cs_act_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["type"],count.index)}_${element(var.adc-lb["port"],count.index)}"
+  targetvserver = "lb_vs_${element(var.adc-lb["name"],count.index)}_${element(var.adc-lb["type"],count.index)}_${element(var.adc-lb["port"],count.index)}"
 }
 
 resource "citrixadc_csaction" "cs_action_gw" {
