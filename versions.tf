@@ -3,7 +3,7 @@ terraform {
   required_providers {
     citrixadc = {
       source = "citrix/citrixadc"
-      version = ">= 1.28.0"
+      version = ">= 1.31.0"
     }
   }
 }
