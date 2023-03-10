@@ -25,6 +25,7 @@ resource "citrixadc_csaction" "cs_action_gw" {
 #####
 # Add Content Switching Policies
 #####
+
 resource "citrixadc_cspolicy" "cs_policy_lb" {
   count      = length(var.adc-cs-lb.name)
   policyname = "cs_pol_${element(var.adc-cs-lb["name"],count.index)}.${var.adc-base.fqdn_ext}_http_80"
@@ -52,6 +53,7 @@ resource "citrixadc_cspolicy" "cs_policy_gw" {
 #####
 # Add Content Switching vServer
 #####
+
 resource "citrixadc_csvserver" "cs_vserver" {
   name            = var.adc-cs.vserver_name
   ipv46           = var.adc-cs.vserver_ip
@@ -70,6 +72,7 @@ resource "citrixadc_csvserver" "cs_vserver" {
 #####
 # Bind Content Switching Policies to Content Switching vServer
 #####
+
 resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_lb" {
     count                  = length(var.adc-cs-lb.name)
     name                   = citrixadc_csvserver.cs_vserver.name
@@ -93,6 +96,7 @@ resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_gw" {
     citrixadc_csvserver.cs_vserver
   ]
 }
+
 #resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_lb" {
 #    count                  = length(var.adc-cs-lb.name)
 #    name                   = citrixadc_csvserver.cs_vserver.name
@@ -122,6 +126,7 @@ resource "citrixadc_sslvserver_sslcertkey_binding" "cs_sslvserver_sslcertkey_bin
 #####
 # Save config
 #####
+
 resource "citrixadc_nsconfig_save" "cs_save" {    
     all        = true
     timestamp  = timestamp()
