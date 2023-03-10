@@ -122,8 +122,7 @@ resource "citrixadc_sslvserver_sslcertkey_binding" "cs_sslvserver_sslcertkey_bin
 #####
 # Save config
 #####
-resource "citrixadc_nsconfig_save" "cs_save" {
-    
+resource "citrixadc_nsconfig_save" "cs_save" {    
     all        = true
     timestamp  = timestamp()
 
@@ -132,5 +131,4 @@ resource "citrixadc_nsconfig_save" "cs_save" {
         citrixadc_csvserver_cspolicy_binding.cs_vserverpolicybinding_lb,
         citrixadc_sslvserver_sslcertkey_binding.cs_sslvserver_sslcertkey_binding
     ]
-
 }
