@@ -105,31 +105,19 @@ resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_gw" {
 #  ]
 #}
 
-#resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_gw" {
-#    count                  = length(var.adc-cs-gw.name)
-#    name                   = citrixadc_csvserver.cs_vserver.name
-#    policyname             = "cs_pol_${element(var.adc-cs-gw["name"],count.index)}"
-#    priority               = count.index * 1000
-#    gotopriorityexpression = "END"
-
-#  depends_on  = [
-    #citrixadc_csvserver.cs_vserver
-#  ]
-#}
-
 #####
 # Bind SSL certificate to CS vServers
 #####
 
-#resource "citrixadc_sslvserver_sslcertkey_binding" "cs_sslvserver_sslcertkey_binding" {
-#    vservername = citrixadc_csvserver.cs_vserver.name
-#    certkeyname = "ssl_cert_${var.adc-base.environmentname}"
-#    snicert     = false
+resource "citrixadc_sslvserver_sslcertkey_binding" "cs_sslvserver_sslcertkey_binding" {
+    vservername = citrixadc_csvserver.cs_vserver.name
+    certkeyname = "ssl_cert_${var.adc-base.environmentname}"
+    snicert     = false
 
-#    depends_on  = [
-#      citrixadc_csvserver.cs_vserver
-#    ]
-#}
+    depends_on  = [
+      citrixadc_csvserver.cs_vserver
+    ]
+}
 
 #####
 # Save config
@@ -141,7 +129,8 @@ resource "citrixadc_nsconfig_save" "cs_save" {
 
     depends_on = [
         citrixadc_csvserver_cspolicy_binding.cs_vserverpolicybinding_gw,
-        citrixadc_csvserver_cspolicy_binding.cs_vserverpolicybinding_lb
+        citrixadc_csvserver_cspolicy_binding.cs_vserverpolicybinding_lb,
+        citrixadc_sslvserver_sslcertkey_binding.cs_sslvserver_sslcertkey_binding
     ]
 
 }
