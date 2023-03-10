@@ -1,3 +1,7 @@
+#####
+# Define Locals
+#####
+
 locals {
   cs_vserver_port        = 443
   cs_vserver_type        = "SSL"
