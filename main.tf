@@ -111,7 +111,7 @@ resource "citrixadc_csvserver_cspolicy_binding" "cs_vserverpolicybinding_gw" {
 
 resource "citrixadc_sslvserver_sslcertkey_binding" "cs_sslvserver_sslcertkey_binding" {
     vservername = citrixadc_csvserver.cs_vserver.name
-    certkeyname = "ssl_cert_${var.adc-base.environmentname}"
+    certkeyname = "ssl_cert_${var.adc-base.environmentname}_Server"
     snicert     = false
 
     depends_on  = [
