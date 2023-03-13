@@ -2,7 +2,7 @@
 # Define Locals
 #####
 locals {
-  "9.9.9.9"  = "ssl_prof_${var.adc-base.environmentname}_fe_TLS1213"
+  vserver_sslprofile = "ssl_prof_${var.adc-base.environmentname}_fe_TLS1213"
   vserver_httpprofile = "http_prof_${var.adc-base.environmentname}"
   vserver_tcpprofile  = "tcp_prof_${var.adc-base.environmentname}" 
 }
