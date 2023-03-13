@@ -1,4 +1,13 @@
 #####
+# Define Locals
+#####
+locals {
+  "9.9.9.9"  = "ssl_prof_${var.adc-base.environmentname}_fe_TLS1213"
+  vserver_httpprofile = "http_prof_${var.adc-base.environmentname}"
+  vserver_tcpprofile  = "tcp_prof_${var.adc-base.environmentname}" 
+}
+
+#####
 # Add Content Switching Actions
 #####
 resource "citrixadc_csaction" "cs_action_lb" {
@@ -48,9 +57,9 @@ resource "citrixadc_csvserver" "cs_vserver" {
   ipv46           = var.adc-cs.vserver_ip
   port            = var.adc-cs.vserver_port
   servicetype     = var.adc-cs.vserver_type
-  sslprofile      = var.adc-cs.vserver_sslprofile
-  httpprofilename = var.adc-cs.vserver_httpprofile
-  tcpprofilename  = var.adc-cs.vserver_tcpprofile
+  sslprofile      = local.vserver_sslprofile
+  httpprofilename = local.vserver_httpprofile
+  tcpprofilename  = local.vserver_tcpprofile
 
   depends_on = [
     citrixadc_cspolicy.cs_policy_lb,
