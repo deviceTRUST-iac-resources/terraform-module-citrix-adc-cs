@@ -1,5 +1,5 @@
 #####
-# Variables for administrative connection to the ADC
+# Variable for administrative connection to the ADC
 #####
 variable adc-base {}
 
